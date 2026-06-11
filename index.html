@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>LoveLearn — Grow Together, Then Meet Your Match</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="app">
+
+  <header class="app-header">
+    <div class="header-top">
+      <div>
+        <div class="logo">💞 LoveLearn</div>
+        <div class="header-sub" id="header-sub">Grow together, then meet your match</div>
+      </div>
+      <div class="header-pills" id="header-pills" style="display:none">
+        <div class="pill level-pill" id="level-pill">🌱 Lv.1</div>
+        <div class="pill streak-pill" id="streak-pill">🔥 0</div>
+      </div>
+    </div>
+    <div class="xp-bar-wrap" id="xp-bar-wrap" style="display:none">
+      <div class="xp-bar" id="xp-bar" style="width:0%"></div>
+    </div>
+  </header>
+
+  <main class="app-main">
+
+    <!-- WELCOME -->
+    <section class="screen active" id="screen-welcome">
+      <div class="welcome-hero">
+        <div class="emoji-stack">🏅💞</div>
+        <h1>Welcome to LoveLearn</h1>
+        <p>Get certified mature &amp; healed enough to date — then meet people who did the work too.</p>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title" style="margin-top:0">How it works</h2>
+        <div class="feature-list">
+          <div class="feature-item">
+            <div class="feature-icon">🎓</div>
+            <div class="feature-text">
+              <strong>1. LoveLearn Academy</strong>
+              <span>Level up through 8 modules inspired by Gottman, Perel, Levine &amp; Heller, Sue Johnson, Stan Tatkin and more.</span>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📺</div>
+            <div class="feature-text">
+              <strong>2. Watch &amp; Learn</strong>
+              <span>Each module includes curated videos and key takeaways you can actually use.</span>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">⚡</div>
+            <div class="feature-text">
+              <strong>3. Earn XP &amp; Level Up</strong>
+              <span>Pass each quiz at 80%+ to earn XP, build your daily streak, and unlock the next module.</span>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🏅</div>
+            <div class="feature-text">
+              <strong>4. Get Certified</strong>
+              <span>Pass the Certification Exam to earn your Relationship-Readiness Certification.</span>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">💕</div>
+            <div class="feature-text">
+              <strong>5. Unlock Discover</strong>
+              <span>Certified members unlock profiles, matches, and chat — with people who are ready too.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="btn-get-started">Get Started</button>
+    </section>
+
+    <!-- SIGNUP -->
+    <section class="screen" id="screen-signup">
+      <button class="back-btn" id="signup-back">← Back</button>
+      <h1 class="title">Create your profile</h1>
+      <p class="subtitle">This stays on your device — LoveLearn is a local demo experience.</p>
+
+      <form id="signup-form" class="card">
+        <div class="field">
+          <label for="f-name">First name</label>
+          <input type="text" id="f-name" required maxlength="30" placeholder="e.g. Alex" />
+        </div>
+        <div class="field">
+          <label for="f-age">Age</label>
+          <input type="number" id="f-age" required min="18" max="99" placeholder="e.g. 28" />
+        </div>
+        <div class="field">
+          <label for="f-avatar">Avatar</label>
+          <select id="f-avatar">
+            <option value="🙂">🙂 Smile</option>
+            <option value="👩">👩 Woman</option>
+            <option value="👨">👨 Man</option>
+            <option value="🧑">🧑 Person</option>
+            <option value="👩🏽">👩🏽 Woman</option>
+            <option value="👨🏾">👨🏾 Man</option>
+            <option value="🧑🏻">🧑🏻 Person</option>
+            <option value="🧑🏿">🧑🏿 Person</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-gender">I am</label>
+          <select id="f-gender">
+            <option>Woman</option>
+            <option>Man</option>
+            <option>Non-binary</option>
+            <option>Prefer not to say</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-looking">Looking for</label>
+          <select id="f-looking">
+            <option>Everyone</option>
+            <option>Women</option>
+            <option>Men</option>
+            <option>Non-binary people</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-bio">Short bio</label>
+          <textarea id="f-bio" maxlength="200" placeholder="Tell us a bit about yourself..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Start Learning</button>
+      </form>
+    </section>
+
+    <!-- ACADEMY -->
+    <section class="screen" id="screen-academy">
+      <h1 class="title">LoveLearn Academy</h1>
+      <p class="subtitle">Complete every module, then pass the Certification Exam to unlock Discover &amp; Matches.</p>
+      <div class="card">
+        <div class="progress-label">
+          <span>Your progress</span>
+          <span id="academy-progress-text">0 / 8 complete</span>
+        </div>
+        <div class="progress-wrap"><div class="progress-bar" id="academy-progress-bar" style="width:0%"></div></div>
+      </div>
+      <div id="module-list"></div>
+    </section>
+
+    <!-- MODULE DETAIL -->
+    <section class="screen" id="screen-module">
+      <button class="back-btn" data-nav="academy">← Back to Academy</button>
+      <div id="module-detail"></div>
+    </section>
+
+    <!-- QUIZ -->
+    <section class="screen" id="screen-quiz">
+      <button class="back-btn" id="quiz-back">← Back to Lesson</button>
+      <div id="quiz-content"></div>
+    </section>
+
+    <!-- QUIZ RESULT -->
+    <section class="screen" id="screen-quiz-result">
+      <div id="quiz-result-content"></div>
+    </section>
+
+    <!-- DISCOVER -->
+    <section class="screen" id="screen-discover">
+      <div id="discover-content"></div>
+    </section>
+
+    <!-- MATCHES -->
+    <section class="screen" id="screen-matches">
+      <div id="matches-content"></div>
+    </section>
+
+    <!-- CHAT -->
+    <section class="screen" id="screen-chat">
+      <div id="chat-content"></div>
+    </section>
+
+    <!-- PROFILE -->
+    <section class="screen" id="screen-profile">
+      <div id="profile-content"></div>
+    </section>
+
+    <!-- CERTIFICATE -->
+    <section class="screen" id="screen-certificate">
+      <div id="certificate-content"></div>
+    </section>
+
+    <!-- ELECTIVES -->
+    <section class="screen" id="screen-electives">
+      <div id="electives-content"></div>
+    </section>
+
+  </main>
+
+  <nav class="bottom-nav" id="bottom-nav" style="display:none">
+    <button class="nav-btn" data-nav="academy"><span class="nav-icon">🎓</span>Academy</button>
+    <button class="nav-btn" data-nav="discover"><span class="nav-icon">💕</span>Discover</button>
+    <button class="nav-btn" data-nav="matches"><span class="nav-icon">💬</span>Matches</button>
+    <button class="nav-btn" data-nav="profile"><span class="nav-icon">👤</span>Profile</button>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="modal-overlay" id="match-modal">
+    <div class="modal-card">
+      <div class="match-emoji">💘</div>
+      <h2>It's a Match!</h2>
+      <p id="match-modal-text">You and someone new just matched.</p>
+      <button class="btn btn-primary" id="match-modal-chat">Send a message</button>
+      <button class="btn btn-ghost" id="match-modal-close">Keep browsing</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="levelup-modal">
+    <div class="modal-card levelup-card">
+      <div class="levelup-emoji" id="levelup-emoji">🌱</div>
+      <h2>Level Up!</h2>
+      <p id="levelup-text">You're now Level 2: Curious Learner</p>
+      <button class="btn btn-primary" id="levelup-modal-close">Keep Going</button>
+    </div>
+  </div>
+
+  <div id="confetti-container"></div>
+
+</div>
+
+<script src="curriculum.js"></script>
+<script src="profiles.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
