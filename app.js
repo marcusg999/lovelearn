@@ -268,7 +268,7 @@ function updateStreak() {
 function launchConfetti(count = 60) {
   const container = document.getElementById('confetti-container');
   if (!container) return;
-  const colors = ['#ff5e78', '#7c4dff', '#ffd166', '#06d6a0', '#4cc9f0', '#fb8500'];
+  const colors = ['#a855f7', '#ec4899', '#fbbf24', '#34d399', '#38bdf8', '#fb923c'];
   for (let i = 0; i < count; i++) {
     const piece = document.createElement('div');
     piece.className = 'confetti-piece';
@@ -918,9 +918,9 @@ function generateCertificateCanvas() {
   const ctx = canvas.getContext('2d');
 
   const bgGrad = ctx.createLinearGradient(0, 0, 1200, 630);
-  bgGrad.addColorStop(0, '#ff5e78');
-  bgGrad.addColorStop(0.55, '#7c4dff');
-  bgGrad.addColorStop(1, '#4cc9f0');
+  bgGrad.addColorStop(0, '#a855f7');
+  bgGrad.addColorStop(0.55, '#ec4899');
+  bgGrad.addColorStop(1, '#38bdf8');
   ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, 1200, 630);
 
@@ -932,7 +932,7 @@ function generateCertificateCanvas() {
   ctx.font = '64px sans-serif';
   ctx.fillText('🏅', 600, 150);
 
-  ctx.fillStyle = '#7c4dff';
+  ctx.fillStyle = '#a855f7';
   ctx.font = '600 22px sans-serif';
   ctx.fillText('LOVELEARN ACADEMY', 600, 195);
 
@@ -959,12 +959,12 @@ function generateCertificateCanvas() {
   let y = 445;
   ctx.font = '600 20px sans-serif';
   if (majors.length) {
-    ctx.fillStyle = '#fb8500';
+    ctx.fillStyle = '#f59e0b';
     ctx.fillText(`🏆 Major: ${majors.map(e => e.shortTitle).join(' · ')}`, 600, y);
     y += 34;
   }
   if (minorOnly.length) {
-    ctx.fillStyle = '#7c4dff';
+    ctx.fillStyle = '#a855f7';
     ctx.fillText(`🎓 Minor: ${minorOnly.map(e => e.shortTitle).join(' · ')}`, 600, y);
     y += 34;
   }
