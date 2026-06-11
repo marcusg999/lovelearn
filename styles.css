@@ -632,6 +632,7 @@ h2.section-title { font-family: 'Outfit', sans-serif; font-size: 18px; font-weig
 }
 
 .profile-photo {
+  position: relative;
   height: 60%;
   background: var(--gradient);
   display: flex;
@@ -639,6 +640,35 @@ h2.section-title { font-family: 'Outfit', sans-serif; font-size: 18px; font-weig
   justify-content: center;
   font-size: 110px;
   color: #fff;
+}
+
+.compat-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(12, 10, 20, 0.55);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.advanced-badge {
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.couple-badge {
+  background: rgba(56, 189, 248, 0.18) !important;
+  color: var(--accent2-light) !important;
+}
+
+.play-partner-tag {
+  background: rgba(236, 72, 153, 0.18) !important;
+  color: var(--secondary) !important;
 }
 
 .profile-body { padding: 16px; flex: 1; display: flex; flex-direction: column; }
@@ -674,6 +704,7 @@ h2.section-title { font-family: 'Outfit', sans-serif; font-size: 18px; font-weig
   gap: 24px;
   margin-top: 8px;
 }
+.swipe-actions.single { gap: 0; }
 .swipe-btn {
   width: 60px; height: 60px;
   border-radius: 50%;
@@ -687,6 +718,32 @@ h2.section-title { font-family: 'Outfit', sans-serif; font-size: 18px; font-weig
 }
 .swipe-btn.pass { background: var(--card-bg-2); color: var(--secondary); border: 1px solid var(--border); }
 .swipe-btn.like { background: var(--gradient); color: #fff; }
+
+/* ---------- Locked / Advanced-tier profile card ---------- */
+.locked-photo {
+  filter: blur(14px) brightness(0.7);
+  transform: scale(1.1);
+}
+.lock-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 60%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+.lock-overlay-icon { font-size: 40px; margin-bottom: 8px; }
+.lock-overlay-text {
+  font-weight: 700;
+  font-size: 14px;
+  background: rgba(12, 10, 20, 0.45);
+  padding: 6px 14px;
+  border-radius: 999px;
+}
 
 .empty-stack { text-align: center; padding: 60px 16px; color: var(--text-light); }
 .empty-stack .empty-emoji { font-size: 50px; margin-bottom: 12px; }
@@ -800,6 +857,29 @@ h2.section-title { font-family: 'Outfit', sans-serif; font-size: 18px; font-weig
   border-radius: 999px;
   white-space: nowrap;
 }
+
+.love-plus-card {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.14), rgba(236, 72, 153, 0.10));
+  border: 1px solid var(--primary);
+}
+.love-plus-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.love-plus-icon {
+  font-size: 26px;
+  width: 44px; height: 44px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--card-bg-2);
+  border-radius: 12px;
+}
+.love-plus-title { font-weight: 700; font-size: 14px; color: var(--text); margin-bottom: 4px; }
+.love-plus-sub { font-size: 12px; color: var(--text-light); line-height: 1.5; }
+.love-plus-card .grad-banner { margin-bottom: 0; }
+.love-plus-card .btn { margin-top: 4px; }
 
 .badge-grid {
   display: grid;

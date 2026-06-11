@@ -37,7 +37,7 @@ let quizState = null;
 let toastTimer = null;
 
 function createInitialState() {
-  return { user: null, progress: {}, swiped: {}, matches: [], chats: {}, streak: { count: 0, lastDate: null } };
+  return { user: null, progress: {}, swiped: {}, matches: [], chats: {}, streak: { count: 0, lastDate: null }, requests: {} };
 }
 
 function loadState() {
@@ -183,6 +183,76 @@ function getEarnedMajors() {
 
 function getEarnedMinors() {
   return ELECTIVES.filter(e => hasMinor(e.id));
+}
+
+/* ---------- Advanced tier, compatibility & couples/play-partner gating ----------
+   "Advanced Certified" members have done extra in-depth training (2+ Majors)
+   or upgraded to LoveLearn+ (a free demo toggle). They can view every
+   profile; everyone else sees a locked preview for Advanced-tier profiles
+   and can request access. */
+function isAdvancedTier() {
+  return getEarnedMajors().length >= 2 || !!(state.user && state.user.loveLearnPlus);
+}
+
+function isProfileLocked(profile) {
+  if (profile.tier !== 'advanced') return false;
+  if (isAdvancedTier()) return false;
+  const req = state.requests[profile.id];
+  return !req || req.status !== 'approved';
+}
+
+/* "Special training" for couples seeking play partners: only members who
+   earned a Major in Polyamory & ENM or Kink & Consent see the couple/play
+   partner indicators on Discover. */
+function canSeePlayPartnerInfo() {
+  return hasMajor('polyamory') || hasMajor('kink-consent');
+}
+
+/* Compatibility score based on shared Majors & Minors — "users with similar
+   majors and minors are more comparable." */
+function getCompatibilityScore(profile) {
+  const mySpecs = new Set([
+    ...getEarnedMajors().map(e => e.id),
+    ...getEarnedMinors().map(e => e.id)
+  ]);
+  const theirSpecs = new Set([...(profile.majors || []), ...(profile.minors || [])]);
+  let shared = 0;
+  mySpecs.forEach(id => { if (theirSpecs.has(id)) shared++; });
+  return Math.min(99, 60 + shared * 12);
+}
+
+function getSharedSpecializations(profile) {
+  const theirSpecs = new Set([...(profile.majors || []), ...(profile.minors || [])]);
+  return ELECTIVES.filter(e => (hasMajor(e.id) || hasMinor(e.id)) && theirSpecs.has(e.id));
+}
+
+/* ---------- Advanced access requests ---------- */
+function requestAccess(profileId) {
+  const p = PROFILES.find(x => x.id === profileId);
+  if (!p) return;
+  state.requests[profileId] = { status: 'pending' };
+  saveState();
+  toast('Request sent');
+  if (currentScreen === 'discover') renderDiscover();
+  setTimeout(() => {
+    const approved = Math.random() < 0.6;
+    if (approved) {
+      state.requests[profileId] = { status: 'approved' };
+      toast(`${p.name} approved your request!`);
+    } else {
+      delete state.requests[profileId];
+      toast(`${p.name} isn't accepting requests right now`);
+    }
+    saveState();
+    if (currentScreen === 'discover') renderDiscover();
+  }, 2000);
+}
+
+function toggleLoveLearnPlus(on) {
+  state.user.loveLearnPlus = on;
+  saveState();
+  toast(on ? "LoveLearn+ activated (demo) ⭐" : 'LoveLearn+ cancelled.');
+  renderProfile();
 }
 
 function getLessonIdForQuiz(quizId) {
@@ -1037,24 +1107,60 @@ function renderDiscover() {
     return;
   }
   const p = profiles[0];
-  container.innerHTML = `
-    <h1 class="title">Discover</h1>
-    <p class="subtitle">${profiles.length} profile${profiles.length === 1 ? '' : 's'} to review</p>
-    <div class="card-stack">
-      <div class="profile-card">
-        <div class="profile-photo">${p.avatar}</div>
+  const locked = isProfileLocked(p);
+  let cardHtml;
+  let actionsHtml;
+
+  if (locked) {
+    const req = state.requests[p.id];
+    const pending = !!(req && req.status === 'pending');
+    cardHtml = `
+      <div class="profile-card locked-card">
+        <div class="profile-photo locked-photo">${p.avatar}</div>
+        <div class="lock-overlay">
+          <div class="lock-overlay-icon">🔒</div>
+          <div class="lock-overlay-text">Advanced member</div>
+        </div>
         <div class="profile-body">
           <h2>${escapeHtml(p.name)}, ${p.age}</h2>
+          <p class="profile-bio">This member has completed in-depth advanced training. Get Advanced Certified or request access to view their full profile.</p>
+        </div>
+      </div>
+    `;
+    actionsHtml = `
+      <button class="btn ${pending ? 'btn-secondary' : 'btn-gold'}" data-action="request-access" data-profile="${p.id}" ${pending ? 'disabled' : ''}>
+        ${pending ? '⏳ Request sent — awaiting review...' : '🔒 Request Access'}
+      </button>
+    `;
+  } else {
+    const compat = getCompatibilityScore(p);
+    const showCouple = p.relationshipStructure === 'couple' && p.openToPlayPartners && canSeePlayPartnerInfo();
+    cardHtml = `
+      <div class="profile-card">
+        <div class="profile-photo">
+          ${p.avatar}
+          <div class="compat-badge">🧩 ${compat}% Match</div>
+        </div>
+        <div class="profile-body">
+          <h2>${escapeHtml(p.name)}, ${p.age}${p.tier === 'advanced' ? ' <span class="advanced-badge" title="Advanced Certified">⭐</span>' : ''}</h2>
+          ${showCouple ? `<div class="profile-tags"><span class="profile-tag couple-badge">👫 Couple</span><span class="profile-tag play-partner-tag">Open to play partners</span></div>` : ''}
           <div class="profile-tags">${p.tags.map(t => `<span class="profile-tag">${escapeHtml(t)}</span>`).join('')}</div>
           <p class="profile-bio">${escapeHtml(p.bio)}</p>
           <div class="profile-prompt">"${escapeHtml(p.prompt)}"</div>
         </div>
       </div>
-    </div>
-    <div class="swipe-actions">
+    `;
+    actionsHtml = `
       <button class="swipe-btn pass" data-action="pass" title="Pass">✕</button>
       <button class="swipe-btn like" data-action="like" title="Like">💖</button>
-    </div>
+    `;
+  }
+
+  container.innerHTML = `
+    <h1 class="title">Discover</h1>
+    <p class="subtitle">${profiles.length} profile${profiles.length === 1 ? '' : 's'} to review</p>
+    <div class="card-stack">${cardHtml}</div>
+    <div class="swipe-actions${locked ? ' single' : ''}">${actionsHtml}</div>
   `;
 }
 
@@ -1205,6 +1311,29 @@ function renderProfile() {
     </div>
   `;
 
+  const advanced = isAdvancedTier();
+  const advancedBadge = `
+    <div class="badge ${advanced ? 'earned gold' : ''}">
+      <div class="badge-icon">⭐</div>
+      <div class="badge-name">Advanced Certified</div>
+    </div>
+  `;
+
+  const loveLearnPlusHtml = `
+    <div class="card love-plus-card">
+      <div class="love-plus-row">
+        <div class="love-plus-icon">⭐</div>
+        <div>
+          <div class="love-plus-title">LoveLearn+</div>
+          <div class="love-plus-sub">Advanced Certified members (2+ Majors) can view every Discover profile, including those reserved for in-depth training graduates.</div>
+        </div>
+      </div>
+      ${advanced
+        ? `<div class="grad-banner gold">⭐ Advanced Certified — you can view every profile.</div>${state.user.loveLearnPlus && getEarnedMajors().length < 2 ? '<button class="btn btn-secondary" id="btn-cancel-plus">Cancel LoveLearn+ (demo)</button>' : ''}`
+        : '<button class="btn btn-gold" id="btn-upgrade-plus">Upgrade to LoveLearn+ (demo)</button>'}
+    </div>
+  `;
+
   const electiveBadges = ELECTIVES.map(el => {
     const minorPassed = hasMinor(el.id);
     const majorPassed = hasMajor(el.id);
@@ -1231,7 +1360,7 @@ function renderProfile() {
     <div class="profile-header">
       <div class="profile-avatar">${state.user.avatar}</div>
       <h2>${escapeHtml(state.user.name)}, ${escapeHtml(String(state.user.age))}</h2>
-      <p>${escapeHtml(state.user.gender)} · Looking for ${escapeHtml(state.user.lookingFor)}</p>
+      <p>${escapeHtml(state.user.gender)} · Looking for ${escapeHtml(state.user.lookingFor)}${state.user.relationshipStructure === 'couple' ? ' · 👫 Couple (open to play partners)' : ''}</p>
     </div>
     ${certified ? `<div class="grad-banner gold">🏅 LoveLearn Certified — Discover &amp; Matches unlocked!</div>` : ''}
     <div class="card level-card">
@@ -1245,12 +1374,13 @@ function renderProfile() {
       </div>
       ${levelProgressHtml}
     </div>
+    ${certified ? loveLearnPlusHtml : ''}
     <div class="card">
       <div style="font-size:13px;color:var(--text-light);margin-bottom:6px;">About me</div>
       <p style="font-size:14px;line-height:1.5">${state.user.bio ? escapeHtml(state.user.bio) : 'No bio yet.'}</p>
     </div>
     <h2 class="section-title">My Badges</h2>
-    <div class="badge-grid">${badges}${certBadge}</div>
+    <div class="badge-grid">${badges}${certBadge}${certified ? advancedBadge : ''}</div>
     ${certified ? `
     <h2 class="section-title">Majors &amp; Minors</h2>
     <div class="badge-grid">${electiveBadges}</div>
@@ -1298,13 +1428,17 @@ function handleSignup(e) {
   e.preventDefault();
   const name = document.getElementById('f-name').value.trim();
   const age = document.getElementById('f-age').value;
+  const relationshipStructure = document.getElementById('f-relationship').value;
   state.user = {
     name: name || 'Friend',
     age: age || '18',
     avatar: document.getElementById('f-avatar').value,
     gender: document.getElementById('f-gender').value,
     lookingFor: document.getElementById('f-looking').value,
-    bio: document.getElementById('f-bio').value.trim()
+    bio: document.getElementById('f-bio').value.trim(),
+    relationshipStructure,
+    openToPlayPartners: relationshipStructure === 'couple',
+    loveLearnPlus: false
   };
   saveState();
   updateStreak();
@@ -1351,6 +1485,8 @@ function attachEventListeners() {
     if (resultBtn) {
       if (resultBtn.dataset.action === 'elective-quiz') {
         startQuiz(resultBtn.dataset.quiz);
+      } else if (resultBtn.dataset.action === 'request-access') {
+        if (!resultBtn.disabled) requestAccess(resultBtn.dataset.profile);
       } else {
         handleResultAction(resultBtn.dataset.action, resultBtn.dataset.module);
       }
@@ -1397,6 +1533,12 @@ function attachEventListeners() {
         break;
       case 'btn-reset-all':
         resetAll();
+        break;
+      case 'btn-upgrade-plus':
+        toggleLoveLearnPlus(true);
+        break;
+      case 'btn-cancel-plus':
+        toggleLoveLearnPlus(false);
         break;
     }
   });
